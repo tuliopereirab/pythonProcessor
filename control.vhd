@@ -90,7 +90,8 @@ begin
 									 atual <= jf1;
 								when "00110011" => 
 									 atual <= ja1;
-								-- INPLACE ADD
+								when "00101000" =>
+									 atual <= b1;
 								when "00100000" =>
 									 atual <= b1;
 								when "00100001" =>
@@ -205,6 +206,8 @@ begin
 									 atual <= b4_3;
 								when "00100011" =>
 									 atual <= b4_4;
+								when "00101000" =>
+									 atual <= b4_1;
 								when others => 
 									atual <= first;
 						  end case;

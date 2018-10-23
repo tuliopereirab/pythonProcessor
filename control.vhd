@@ -16,6 +16,8 @@ entity control is
 		entrada_regInstr		: in std_logic_vector((DATA_WIDTH-1) downto 0);
 		entrada_regArg			: in std_logic_vector((DATA_WIDTH-1) downto 0);
 		entrada_regOverflow	: in std_logic;
+		ctrl_regTosFuncao		: out std_logic;
+		ctrl_pilhaFuncao		: out std_logic;
 		ctrl_regOp1				: out std_logic;
 		ctrl_regOp2				: out std_logic;
 		ctrl_regPc				: out std_logic;
@@ -35,7 +37,9 @@ entity control is
 		sel_MuxOp2				: out std_logic_vector(1 downto 0);
 		sel_MuxPilha			: out std_logic_vector(1 downto 0);
 		sel_MuxRegOp1			: out std_logic;
-		sel_ula					: out std_logic_vector(2 downto 0)
+		sel_muxPC				: out std_logic;
+		sel_ula					: out std_logic_vector(2 downto 0);
+		sel_soma_sub			: out std_logic
 	);
 end entity;
 
@@ -47,6 +51,7 @@ signal atual 	: state_type;
 signal verif_muxOp1, verif_muxOp2	: std_logic_vector(1 downto 0);
 --signal sEntrada_regComp, sEntrada_regOverflow	: std_logic;
 signal sEntrada_regInstr, sEntrada_regArg 	: std_logic_vector(7 downto 0);
+
 begin	
 	sEntrada_regArg <= entrada_regArg;
 	--sEntrada_regComp <= entrada_regComp;

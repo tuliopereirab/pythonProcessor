@@ -59,6 +59,12 @@ signal wEntrada_regOpArg	: std_logic_vector((DATA_WIDTH-1) downto 0);
 signal wEntrada_regOverflow, wSaida_regOverflow	: std_logic;
 -- muxRegOp1
 signal wSaida_MuxRegOp1	: std_logic_vector((DATA_WIDTH-1) downto 0);
+-- regPc
+signal wEntrada_regPc	: std_logic_vector((DATA_WIDTH-1) downto 0);
+--funcoes
+signal muxPc_ctrl, pilhaFuncao_ctrl, soma_sub_ctrl, regTosFuncao_ctrl	: std_logic;
+signal wSaida_regTosFuncao, wSaida_pilhaFuncao, wEntrada_regTosFuncao	: std_logic_vector((DATA_WIDTH-1) downto 0);
+
 
 component regOp1 is
 	generic
@@ -377,14 +383,16 @@ component control is
 		entrada_regInstr		: in std_logic_vector((DATA_WIDTH-1) downto 0);
 		entrada_regArg			: in std_logic_vector((DATA_WIDTH-1) downto 0);
 		entrada_regOverflow	: in std_logic;
+		ctrl_regTosFuncao		: out std_logic;
+		ctrl_pilhaFuncao		: out std_logic;
 		ctrl_regOp1				: out std_logic;
 		ctrl_regOp2				: out std_logic;
 		ctrl_regPc				: out std_logic;
 		ctrl_regComp			: out std_logic;
+		ctrl_regOverflow		: out std_logic;
 		ctrl_regTos				: out std_logic;
 		ctrl_regInstr			: out std_logic;
 		ctrl_regArg				: out std_logic;
-		ctrl_regOverflow		: out std_logic;
 		ctrl_regEnd				: out std_logic;
 		ctrl_regPilha_WRITE	: out std_logic;
 		ctrl_regPilha_SAIDA	: out std_logic;
@@ -396,7 +404,71 @@ component control is
 		sel_MuxOp2				: out std_logic_vector(1 downto 0);
 		sel_MuxPilha			: out std_logic_vector(1 downto 0);
 		sel_MuxRegOp1			: out std_logic;
-		sel_ula					: out std_logic_vector(2 downto 0)
+		sel_muxPC				: out std_logic;
+		sel_ula					: out std_logic_vector(2 downto 0);
+		sel_soma_sub			: out std_logic
+	);
+end component;
+
+component pilhaFuncao is
+	generic
+	(
+		DATA_WIDTH	:	natural	:= 8;
+		END_WIDTH	:	natural	:= 8
+	);
+	
+	port
+	(
+		clk						: in std_logic;
+		ctrl_pilhaFuncao		: in std_logic;
+		entrada_tosFuncao		: in std_logic_vector((DATA_WIDTH-1) downto 0);
+		entrada_Pc				: in std_logic_vector((DATA_WIDTH-1) downto 0);
+		saida_Pc					: out std_logic_vector((DATA_WIDTH-1) downto 0)
+	);
+end component;
+
+component muxPc is
+	generic 
+	(
+		DATA_WIDTH	: natural	:= 8
+	);
+	
+	port
+	(
+		ctrl_muxPc		: in std_logic;
+		entrada_Ula	: in std_logic_vector((DATA_WIDTH-1) downto 0);
+		entrada_Pilha	: in std_logic_vector((DATA_WIDTH-1) downto 0);
+		saida_Pc	: out std_logic_vector((DATA_WIDTH-1) downto 0)
+	);
+end component;
+
+component regTosFuncao is
+	generic
+	(
+		DATA_WIDTH	: natural := 8
+	);
+	
+	port
+	(
+		clk				: in std_logic;
+		reset				: in std_logic;
+		ctrl_regTosFuncao		: in std_logic;
+		entrada_regTosFuncao	: in std_logic_vector((DATA_WIDTH-1) downto 0);
+		saida_regTosFuncao	: out std_logic_vector((DATA_WIDTH-1) downto 0)
+	);
+end component;
+
+component somador_subtrator is
+	generic
+	(
+		DATA_WIDTH	: natural	:= 8
+	);
+	
+	port
+	(
+		sel_somaSub				: in std_logic;
+		entrada			: in std_logic_vector((DATA_WIDTH-1) downto 0);     
+		saida		: out std_logic_vector((DATA_WIDTH-1) downto 0)
 	);
 end component;
 
@@ -425,7 +497,7 @@ comp_regPc	: regPc
 		clk => clk_geral,
 		reset => reset_ctrl,
 		ctrl_regPc => regPc_ctrl,
-		entrada_regPc => wSaida_Ula,
+		entrada_regPc => wEntrada_regPc,
 		saida_regPc => wSaida_regPc
 	);
 	
@@ -606,7 +678,11 @@ comp_control	: control
 		sel_MuxOp2 => muxOp2_sel,
 		sel_MuxPilha => MuxPilha_sel,
 		sel_MuxRegOp1 => muxRegOp1_ctrl,
-		sel_Ula => Ula_sel
+		sel_Ula => Ula_sel,
+		sel_soma_sub => soma_sub_ctrl,
+		sel_muxPC => muxPc_ctrl,
+		ctrl_pilhaFuncao => pilhaFuncao_ctrl,
+		ctrl_regTosFuncao => regTosFuncao_ctrl
 	);
 
 comp_muxRegOp1	: muxRegOp1
@@ -616,6 +692,44 @@ comp_muxRegOp1	: muxRegOp1
 		entrada_regArg => wSaida_memInstr,
 		entrada_regOp1 => wSaida_regOp1,
 		saida_muxRegOp1 => wSaida_MuxRegOp1
+	);
+	
+comp_pilhaFuncao	: pilhaFuncao
+	port map
+	(
+		clk => clk_geral,
+		ctrl_pilhaFuncao => pilhaFuncao_ctrl,
+		entrada_tosFuncao => wSaida_regTosFuncao,
+		entrada_Pc => wSaida_regPc,
+		saida_Pc => wSaida_pilhaFuncao
+		
+	);
+
+comp_muxPC		: muxPc
+	port map
+	(
+		ctrl_muxPc => muxPc_ctrl,
+		entrada_Ula => wSaida_Ula,
+		entrada_Pilha => wSaida_PilhaFuncao,
+		saida_Pc => wEntrada_regPc
+	);
+	
+comp_regTosFuncao	: regTosFuncao
+	port map
+	(
+		clk => clk_geral,
+		reset => reset_geral,
+		ctrl_regTosFuncao => regTosFuncao_ctrl,
+		entrada_regTosFuncao => wEntrada_regTosFuncao,
+		saida_regTosFuncao => wSaida_regTosFuncao
+	);
+
+comp_somador_subtrator	: somador_subtrator
+	port map
+	(
+		sel_somaSub => soma_sub_ctrl,
+		entrada => wSaida_regTosFuncao,
+		saida => wEntrada_regTosFuncao
 	);
 	
 	overflow_geral <= wSaida_regOverflow;

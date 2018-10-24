@@ -1851,9 +1851,9 @@ begin
 					 sel_MuxOp1 <= "10";
 					 sel_MuxOp2 <= "01";
 					 sel_ula <= "000";
+					 sel_muxTos <= '0';
 					 -- ---------------------------
 					 ctrl_regDataReturn <= '0';
-					 sel_muxTos <= '1';
 					 sel_muxPC <= '1';
 					 ctrl_regInstr <= '0';
 					 ctrl_regArg <= '0';
@@ -1884,7 +1884,7 @@ begin
 					 sel_MuxOp2 <= "01";
 					 sel_ula <= "000";
 					 ctrl_regDataReturn <= '0';
-					 sel_muxTos <= '1';
+					 sel_muxTos <= '0';
 					 sel_muxPC <= '1';
 					 ctrl_regInstr <= '0';
 					 ctrl_regArg <= '0';
@@ -1914,7 +1914,7 @@ begin
 					 sel_MuxOp2 <= "01";
 					 sel_ula <= "000";
 					 ctrl_regDataReturn <= '0';
-					 sel_muxTos <= '1';
+					 sel_muxTos <= '0';
 					 sel_muxPC <= '1';
 					 ctrl_regInstr <= '0';
 					 ctrl_regArg <= '0';
@@ -1944,7 +1944,7 @@ begin
 					 sel_MuxOp2 <= "01";
 					 sel_ula <= "000";
 					 ctrl_regDataReturn <= '0';
-					 sel_muxTos <= '1';
+					 sel_muxTos <= '0';
 					 sel_muxPC <= '1';
 					 ctrl_regInstr <= '0';
 					 ctrl_regArg <= '0';

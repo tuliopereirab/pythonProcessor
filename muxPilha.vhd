@@ -13,6 +13,7 @@ entity muxPilha is
 		entr_ULA				: in std_logic_vector((DATA_WIDTH-1) downto 0);
 		entr_memInstr		: in std_logic_vector((DATA_WIDTH-1) downto 0);
 		entr_memExt			: in std_logic_vector((DATA_WIDTH-1) downto 0);
+		entr_regDataReturn : in std_logic_vector((DATA_WIDTH-1) downto 0);
 		saida_muxPilha		: out std_logic_vector((DATA_WIDTH-1) downto 0)
 	);
 end entity;
@@ -22,5 +23,5 @@ begin
 	saida_muxPilha <= entr_ULA when (sel_muxPilha="00") else
 							entr_memInstr when (sel_muxPilha="11") else
 							entr_memExt	when (sel_muxPilha="01") else
-							"00000000";
+							entr_regDataReturn;
 end muxPilh;

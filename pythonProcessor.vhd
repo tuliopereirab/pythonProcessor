@@ -64,7 +64,9 @@ signal wEntrada_regPc	: std_logic_vector((DATA_WIDTH-1) downto 0);
 --funcoes
 signal muxPc_ctrl, pilhaFuncao_ctrl, soma_sub_ctrl, regTosFuncao_ctrl	: std_logic;
 signal wSaida_regTosFuncao, wSaida_pilhaFuncao, wEntrada_regTosFuncao	: std_logic_vector((DATA_WIDTH-1) downto 0);
-
+-- retorno
+signal muxTos_ctrl, regDataReturn_ctrl, pilhaRetorno_ctrl	: std_logic;
+signal wSaida_muxTos, wSaida_regDataReturn, wSaida_pilhaRetorno	: std_logic_vector((DATA_WIDTH-1) downto 0);
 
 component regOp1 is
 	generic
@@ -250,6 +252,7 @@ component muxPilha is
 		entr_ULA				: in std_logic_vector((DATA_WIDTH-1) downto 0);
 		entr_memInstr		: in std_logic_vector((DATA_WIDTH-1) downto 0);
 		entr_memExt			: in std_logic_vector((DATA_WIDTH-1) downto 0);
+		entr_regDataReturn : in std_logic_vector((DATA_WIDTH-1) downto 0);
 		saida_muxPilha		: out std_logic_vector((DATA_WIDTH-1) downto 0)
 	);
 end component;
@@ -383,6 +386,8 @@ component control is
 		entrada_regInstr		: in std_logic_vector((DATA_WIDTH-1) downto 0);
 		entrada_regArg			: in std_logic_vector((DATA_WIDTH-1) downto 0);
 		entrada_regOverflow	: in std_logic;
+		ctrl_regDataReturn	: out std_logic;
+		ctrl_pilhaRetorno		: out std_logic;
 		ctrl_regTosFuncao		: out std_logic;
 		ctrl_pilhaFuncao		: out std_logic;
 		ctrl_regOp1				: out std_logic;
@@ -406,7 +411,8 @@ component control is
 		sel_MuxRegOp1			: out std_logic;
 		sel_muxPC				: out std_logic;
 		sel_ula					: out std_logic_vector(2 downto 0);
-		sel_soma_sub			: out std_logic
+		sel_soma_sub			: out std_logic;
+		sel_muxTos				: out std_logic
 	);
 end component;
 
@@ -472,7 +478,83 @@ component somador_subtrator is
 	);
 end component;
 
+component muxTos is
+	generic 
+	(
+		DATA_WIDTH	: natural	:= 8
+	);
+	
+	port
+	(
+		ctrl_muxTos		: in std_logic;
+		entrada_Ula	: in std_logic_vector((DATA_WIDTH-1) downto 0);
+		entrada_Tos	: in std_logic_vector((DATA_WIDTH-1) downto 0);
+		saida_Tos	: out std_logic_vector((DATA_WIDTH-1) downto 0)
+	);
+end component;
+
+component pilhaRetorno is
+	generic
+	(
+		DATA_WIDTH	:	natural	:= 8;
+		END_WIDTH	:	natural	:= 8
+	);
+	
+	port
+	(
+		clk				: in std_logic;
+		ctrl_pilhaRetorno		: in std_logic;
+		entrada_tosRetorno	: in std_logic_vector((DATA_WIDTH-1) downto 0);
+		entrada_Tos	: in std_logic_vector((DATA_WIDTH-1) downto 0);
+		saida_Tos		: out std_logic_vector((DATA_WIDTH-1) downto 0)
+	);
+end component;
+
+component regDataReturn is
+	generic
+	(
+		DATA_WIDTH	: natural := 8
+	);
+	
+	port
+	(
+		clk					: in std_logic;
+		ctrl_regDataReturn			: in std_logic;
+		entrada_readPilha		: in std_logic_vector((DATA_WIDTH-1) downto 0);
+		saida_muxPilha		: out std_logic_vector((DATA_WIDTH-1) downto 0)
+	);
+end component;
+
 begin
+
+comp_regDataReturn	: regDataReturn
+	port map
+	(
+		clk => clk_geral,
+		ctrl_regDataReturn => regDataReturn_ctrl,
+		entrada_readPilha => wPilha_read,
+		saida_muxPilha => wSaida_regDataReturn
+	);
+
+comp_pilhaRetorno	: pilhaRetorno
+	port map
+	(
+		clk => clk_geral,
+		ctrl_pilhaRetorno => pilhaRetorno_ctrl,
+		entrada_tosRetorno => wSaida_regTosFuncao,
+		entrada_Tos => wSaida_regTos,
+		saida_Tos => wSaida_pilhaRetorno
+	);
+
+comp_muxTos	: muxTos
+	port map
+	(
+		ctrl_muxTos => muxTos_ctrl,
+		entrada_Ula => wSaida_Ula,
+		entrada_Tos => wSaida_pilhaRetorno,
+		saida_Tos => wSaida_muxTos
+	);
+
 comp_regOp1	: regOp1
 	port map
 	(
@@ -507,7 +589,7 @@ comp_regTos	: regTos
 		clk => clk_geral,
 		reset => reset_ctrl,
 		ctrl_regTos => regTos_ctrl,
-		entrada_regTos => wSaida_Ula,
+		entrada_regTos => wSaida_muxTos,
 		saida_regTos => wSaida_regTos
 	);
 
@@ -595,6 +677,7 @@ comp_muxPilha	: muxPilha
 		entr_ULA	=> wSaida_Ula,
 		entr_memInstr => wSaida_memInstr,
 		entr_memExt => wSaida_regMemExt,
+		entr_regDataReturn => wSaida_regDataReturn,
 		saida_muxPilha => wEntrada_regPilha
 	);
 	
@@ -682,7 +765,10 @@ comp_control	: control
 		sel_soma_sub => soma_sub_ctrl,
 		sel_muxPC => muxPc_ctrl,
 		ctrl_pilhaFuncao => pilhaFuncao_ctrl,
-		ctrl_regTosFuncao => regTosFuncao_ctrl
+		ctrl_regTosFuncao => regTosFuncao_ctrl,
+		sel_muxTos => muxTos_ctrl,
+		ctrl_regDataReturn => regDataReturn_ctrl,
+		ctrl_pilhaRetorno => pilhaRetorno_ctrl
 	);
 
 comp_muxRegOp1	: muxRegOp1

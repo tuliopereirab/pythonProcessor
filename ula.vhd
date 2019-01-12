@@ -25,7 +25,7 @@ architecture Ula1 of ula is
 signal s_add, s_sub, saida_interna	: std_logic_vector((DATA_WIDTH-1) downto 0);
 signal saida_comparacao, saida_overflow	: std_logic;
 signal s_igual, s_menor, s_maior  : std_logic;
-signal s_mult, s_div 	: std_logic_vector(15 downto 0); -- PARA MULTIPLICAÃÃO, DOBRO DE DATA_WIDTH
+signal s_mult, s_div 	: std_logic_vector(15 downto 0); -- PARA MULTIPLIÇÃO, DOBRO DE DATA_WIDTH
 begin
 	s_add		<= entrada_Op2 + entrada_Op1;
 	s_sub		<= entrada_Op2 - entrada_Op1;
@@ -50,8 +50,9 @@ begin
 	                    s_menor when (sel_Ula="101") else
 	                    s_maior when (sel_Ula="110") else
 	                    '0';				
-	saida_overflow <= '1' when ((sel_Ula="010") AND (s_mult(15 downto 8)/="00000000")) else
-								    '0';
+	saida_overflow <= '1' when ((sel_Ula="010") AND (s_mult(15 downto 8)/="00000000")) else		-- controle de overflow para multiplicação
+							'1' when ((entrada_Op2>entrada_Op1) AND (sel_Ula="001")) else       -- controle de overflow para subtração 
+							'0';
 								
 	---------------------------------------------------------------
 	

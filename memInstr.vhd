@@ -6,7 +6,7 @@ entity memInstr is
 	generic
 	(
 		DATA_WIDTH	: natural	:= 16;
-		END_WIDTH	: natural	:= 8;
+		END_WIDTH	: natural	:= 32;
 		DATA_OUT	: natural	:= 8
 	);
 	

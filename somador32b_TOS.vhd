@@ -6,27 +6,23 @@ use ieee.std_logic_unsigned.all;
 entity somador32b_TOS is
 	generic
 	(
-		DATA_WIDTH	: natural	:= 32;
-		INCREMENTA_WIDTH	: natural	:= 8
+		DATA_WIDTH	: natural	:= 32
 	);
 	port 
 	(
-		ctrl_somador32b	: in std_logic;
-		valPc_in	: in std_logic_vector((DATA_WIDTH-1) downto 0);
-		valIncrementa_in	: in std_logic_vector((INCREMENTA_WIDTH-1) downto 0);
-		valPc_out	: out std_logic_vector((DATA_WIDTH-1) downto 0)
+		ctrl_somadorTos	: in std_logic;
+		valTos_in	: in std_logic_vector((DATA_WIDTH-1) downto 0);
+		valTos_out	: out std_logic_vector((DATA_WIDTH-1) downto 0)
 	);
 end entity;
 
 architecture rtl_somador32b of somador32b is
-signal valIncrementa_32b, valPc_saida_interna	: std_logic_vector((DATA_WIDTH-1) downto 0);
+signal soma, sub	: std_logic_vector((DATA_WIDTH-1) downto 0);
 begin
-	valIncrementa_32b((DATA_WIDTH-1) downto 8) <= "000000000000000000000000";
-	valIncrementa_32b(7 downto 0) <= valIncrementa_in;
+	soma <= valTos_in + "00000000000000000000000000000001";
+	sub <= valTos_in - "00000000000000000000000000000001";
 	
-	valPc_saida_interna <= valPc_in + valincrementa_32b;
-	
-	valPc_out <= valPc_saida_interna when (ctrl_somador32b='0') else
-					 valIncrementa_32b;
+	valTos_out <= soma when (ctrl_somadorTos='0') else
+					  sub;
 	
 end rtl_somador32b;

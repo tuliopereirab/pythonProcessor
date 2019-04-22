@@ -12,14 +12,14 @@ entity regOp2 is
 		clk				: in std_logic;
 		ctrl_regOp2		: in std_logic;
 		entrada_regOp2	: in std_logic_vector((DATA_WIDTH-1) downto 0);
-		saida_regOp2	: out std_logic_vector(((DATA_WIDTH*3)-1) downto 0)
+		saida_regOp2	: out std_logic_vector(((DATA_WIDTH*2)-1) downto 0)
 	);
 end entity;
 
 architecture registerOp2 of regOp2 is
-signal saida_interna	: std_logic_vector(((DATA_WIDTH*3)-1) downto 0);
+signal saida_interna	: std_logic_vector(((DATA_WIDTH*2)-1) downto 0);
 begin
-	saida_interna <= "0000000000000000" & entrada_regOp2;
+	saida_interna <= "00000000" & entrada_regOp2;
 	process(clk)
 	begin
 		if(rising_edge(clk)) then

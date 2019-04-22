@@ -5,7 +5,7 @@ entity pythonProcessor is
 	generic
 	(
 		DATA_WIDTH	: natural := 8;
-		DATA_END	: natural := 24
+		DATA_END	: natural := 16
 	);
 
 	port
@@ -87,7 +87,7 @@ component regOp1 is
 		clk					: in std_logic;
 		ctrl_regOp1			: in std_logic;
 		entrada_regOp1		: in std_logic_vector((DATA_WIDTH-1) downto 0);
-		saida_regOp1		: out std_logic_vector(((DATA_WIDTH*3)-1) downto 0)
+		saida_regOp1		: out std_logic_vector(((DATA_WIDTH*2)-1) downto 0)
 	);
 end component;
 
@@ -102,14 +102,14 @@ component regOp2 is
 		clk				: in std_logic;
 		ctrl_regOp2		: in std_logic;
 		entrada_regOp2	: in std_logic_vector((DATA_WIDTH-1) downto 0);
-		saida_regOp2	: out std_logic_vector(((DATA_WIDTH*3)-1) downto 0)
+		saida_regOp2	: out std_logic_vector(((DATA_WIDTH*2)-1) downto 0)
 	);
 end component;
 
 component regPc is
 	generic
 	(
-		DATA_WIDTH	: natural := 24
+		DATA_WIDTH	: natural := 16
 	);
 
 	port
@@ -125,7 +125,7 @@ end component;
 component regTos is
 	generic
 	(
-		DATA_WIDTH	: natural := 24
+		DATA_WIDTH	: natural := 16
 	);
 
 	port
@@ -141,7 +141,7 @@ end component;
 component regEnd is
 	generic
 	(
-		DATA_WIDTH	: natural := 24
+		DATA_WIDTH	: natural := 16
 	);
 
 	port
@@ -220,7 +220,7 @@ end component;
 component muxOp1 is
 	generic
 	(
-		DATA_WIDTH	: natural := 24
+		DATA_WIDTH	: natural := 16
 	);
 
 	port
@@ -235,7 +235,7 @@ end component;
 component muxOp2 is
 	generic
 	(
-		DATA_WIDTH	: natural := 24;
+		DATA_WIDTH	: natural := 16;
 		LENGTH_REG_ARG	: natural := 8
 	);
 
@@ -259,7 +259,7 @@ component muxPilha is
 	port
 	(
 		sel_muxPilha		: in std_logic_vector(1 downto 0);
-		entr_ULA			: in std_logic_vector(((DATA_WIDTH*3)-1) downto 0);
+		entr_ULA			: in std_logic_vector(((DATA_WIDTH*2)-1) downto 0);
 		entr_memInstr		: in std_logic_vector((DATA_WIDTH-1) downto 0);
 		entr_memExt			: in std_logic_vector((DATA_WIDTH-1) downto 0);
 		entr_regDataReturn  : in std_logic_vector((DATA_WIDTH-1) downto 0);
@@ -303,7 +303,7 @@ end component;
 component ula is
 	generic
 	(
-		DATA_WIDTH	: natural	:= 24
+		DATA_WIDTH	: natural	:= 16
 	);
 
 	port
@@ -321,7 +321,7 @@ component pilha is
 	generic
 	(
 		DATA_WIDTH	:	natural	:= 8;
-		END_WIDTH	:	natural	:= 24
+		END_WIDTH	:	natural	:= 16
 	);
 
 	port
@@ -338,7 +338,7 @@ component memExt is
 	generic
 	(
 		DATA_WIDTH	: natural	:= 8;
-		END_WIDTH	: natural 	:= 24
+		END_WIDTH	: natural 	:= 16
 	);
 
 	port
@@ -355,7 +355,7 @@ component memInstr is
 	generic
 	(
 		DATA_WIDTH	: natural	:= 16;
-		END_WIDTH	: natural	:= 24;
+		END_WIDTH	: natural	:= 16;
 		DATA_OUT	: natural	:= 8
 	);
 
@@ -432,7 +432,7 @@ end component;
 component pilhaFuncao is
 	generic
 	(
-		DATA_WIDTH	:	natural	:= 24;
+		DATA_WIDTH	:	natural	:= 16;
 		END_WIDTH	:	natural	:= 8
 	);
 
@@ -449,7 +449,7 @@ end component;
 component muxPc is
 	generic
 	(
-		DATA_WIDTH	: natural	:= 24
+		DATA_WIDTH	: natural	:= 16
 	);
 
 	port
@@ -494,7 +494,7 @@ end component;
 component muxTos is
 	generic
 	(
-		DATA_WIDTH	: natural	:= 24
+		DATA_WIDTH	: natural	:= 16
 	);
 
 	port
@@ -509,7 +509,7 @@ end component;
 component pilhaRetorno is
 	generic
 	(
-		DATA_WIDTH	:	natural	:= 24;
+		DATA_WIDTH	:	natural	:= 16;
 		END_WIDTH	:	natural	:= 8
 	);
 
@@ -542,7 +542,7 @@ end component;
 component regJump is
 	generic
 	(
-		DATA_SAIDA	: natural := 24;
+		DATA_SAIDA	: natural := 16;
 		DATA_HALF	: natural := 8
 	);
 

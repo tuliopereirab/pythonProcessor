@@ -7,7 +7,7 @@ use ieee.std_logic_arith.all;
 entity Ula is
 	generic
 	(
-		DATA_WIDTH	: natural	:= 24
+		DATA_WIDTH	: natural	:= 16
 	);
 
 	port
@@ -30,7 +30,7 @@ begin
 	s_add		<= entrada_Op2 + entrada_Op1;
 	s_sub		<= entrada_Op2 - entrada_Op1;
 	s_mult	<= entrada_Op2 * entrada_Op1;
-	s_div		<= "000000000000000000000000000000000000000000000000"; -- entrada_Op1 / entrada_Op2;     ERRO DIVISÃO!
+	s_div		<= "00000000000000000000000000000000"; -- entrada_Op1 / entrada_Op2;     ERRO DIVISÃO!
 
 
 	s_igual <= '1' when (entrada_Op2=entrada_Op1) else
@@ -45,12 +45,12 @@ begin
 					 s_sub when (sel_Ula="001") else
 					 s_mult((DATA_WIDTH-1) downto 0) when (sel_Ula="010") else
 					 s_div((DATA_WIDTH-1) downto 0) when (sel_Ula="011") else
-					 "000000000000000000000000";     -- 24 bits
+					 "0000000000000000";     -- 24 bits
 	saida_comparacao <= s_igual when (sel_Ula="100") else
 	                    s_menor when (sel_Ula="101") else
 	                    s_maior when (sel_Ula="110") else
 	                    '0';
-	saida_overflow <= '1' when ((sel_Ula="010") AND (s_mult(23 downto 8)/="0000000000000000")) else		-- controle de overflow para multiplicação
+	saida_overflow <= '1' when ((sel_Ula="010") AND (s_mult(15 downto 8)/="00000000")) else		-- controle de overflow para multiplicação
 					  '1' when ((entrada_Op2>entrada_Op1) AND (sel_Ula="001")) else       -- controle de overflow para subtração
 					  '0';
 
@@ -60,7 +60,7 @@ begin
 					 '0';
 
 	saida_Result <= saida_interna when (sel_Ula(2)='0') else
-					"000000000000000000000000";
+					"0000000000000000";
 
 	saida_regOverflow <= saida_overflow;
 

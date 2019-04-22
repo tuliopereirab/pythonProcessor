@@ -10,7 +10,7 @@ entity muxPilha is
 	port
 	(
 		sel_muxPilha		: in std_logic_vector(1 downto 0);
-		entr_ULA			: in std_logic_vector(((DATA_WIDTH*3)-1) downto 0);     -- width = 24 bits
+		entr_ULA			: in std_logic_vector(((DATA_WIDTH*2)-1) downto 0);     -- width = 24 bits
 		entr_memInstr		: in std_logic_vector((DATA_WIDTH-1) downto 0);
 		entr_memExt			: in std_logic_vector((DATA_WIDTH-1) downto 0);
 		entr_regDataReturn  : in std_logic_vector((DATA_WIDTH-1) downto 0);

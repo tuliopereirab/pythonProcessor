@@ -4,7 +4,7 @@ use ieee.std_logic_1164.all;
 entity regJump is
 	generic
 	(
-		DATA_SAIDA	: natural := 24;
+		DATA_SAIDA	: natural := 16;
 		DATA_HALF	: natural := 8
 	);
 
@@ -24,7 +24,7 @@ begin
 	begin
 		if(rising_edge(clk)) then
 			if(ctrl_regJump='1') then
-				saida_regJump <= entrada_regArg & entrada_memInstr;
+				saida_regJump <= entrada_memInstr;--entrada_regArg & entrada_memInstr;
 			end if;
 		end if;
 	end process;

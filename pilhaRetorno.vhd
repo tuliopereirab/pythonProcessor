@@ -6,7 +6,7 @@ use ieee.numeric_std.all;
 entity pilhaRetorno is
 	generic
 	(
-		DATA_WIDTH	:	natural	:= 24;
+		DATA_WIDTH	:	natural	:= 16;
 		END_WIDTH	:	natural	:= 8
 	);
 

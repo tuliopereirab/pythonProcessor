@@ -7,7 +7,7 @@ entity pilha is
 	generic
 	(
 		DATA_WIDTH	:	natural	:= 8;
-		END_WIDTH	:	natural	:= 24
+		END_WIDTH	:	natural	:= 16
 	);
 
 	port

@@ -4,7 +4,7 @@ use ieee.std_logic_1164.all;
 entity muxOp1 is
 	generic
 	(
-		DATA_WIDTH	: natural := 24
+		DATA_WIDTH	: natural := 16
 	);
 
 	port
@@ -21,9 +21,9 @@ end entity;
 architecture mux1 of muxOp1 is
 signal val1, val0, valPilha	: std_logic_vector((DATA_WIDTH-1) downto 0);
 begin
-	val1 <= "000000000000000000000001";
-	val0 <= "000000000000000000000000";
-	valPilha <= "000000000000000000000001";
+	val1 <= "0000000000000001";
+	val0 <= "0000000000000000";
+	valPilha <= "0000000000000001";
 
 	saida_muxOp1 <= entr_regOp1 when (sel_MuxOp1="11") else
 						 val0 when (sel_MuxOp1="00") else

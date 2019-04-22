@@ -4,7 +4,7 @@ use ieee.std_logic_1164.all;
 entity muxTos is
 	generic
 	(
-		DATA_WIDTH	: natural	:= 24
+		DATA_WIDTH	: natural	:= 16
 	);
 
 	port

@@ -4,7 +4,7 @@ use ieee.std_logic_1164.all;
 entity muxOp2 is
 	generic
 	(
-		DATA_WIDTH	: natural := 24;
+		DATA_WIDTH	: natural := 16;
 		LENGTH_REG_ARG	: natural := 8
 	);
 
@@ -22,7 +22,7 @@ end entity;
 architecture mux2 of muxOp2 is
 signal intern_regArg	: std_logic_vector((DATA_WIDTH-1) downto 0);
 begin
-	intern_regArg <= "0000000000000000" & entr_regArg;
+	intern_regArg <= "00000000" & entr_regArg;
 	saida_muxOp2 <= entr_regOp2 when (sel_MuxOp2="11") else
 						 entr_regPc when (sel_MuxOp2="00") else
 						 entr_regTos when (sel_MuxOp2="01") else

@@ -4,9 +4,9 @@ use ieee.std_logic_1164.all;
 entity regTos is
 	generic
 	(
-		DATA_WIDTH	: natural := 8
+		DATA_WIDTH	: natural := 24
 	);
-	
+
 	port
 	(
 		clk				: in std_logic;
@@ -23,7 +23,7 @@ begin
 	begin
 		if(rising_edge(clk)) then
 			if(reset='1') then
-				saida_regTos <= "00000000";
+				saida_regTos <= "000000000000000000000000";   -- 24 bits
 			elsif(ctrl_regTos='1') then
 				saida_regTos <= entrada_regTos;
 			end if;

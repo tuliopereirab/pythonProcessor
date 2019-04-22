@@ -4,9 +4,9 @@ use ieee.std_logic_1164.all;
 entity regEnd is
 	generic
 	(
-		DATA_WIDTH	: natural := 8
+		DATA_WIDTH	: natural := 24
 	);
-	
+
 	port
 	(
 		clk				: in std_logic;

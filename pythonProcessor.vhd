@@ -4,9 +4,10 @@ use ieee.std_logic_1164.all;
 entity pythonProcessor is
 	generic
 	(
-		DATA_WIDTH	: natural := 8
+		DATA_WIDTH	: natural := 8;
+		DATA_END	: natural := 24
 	);
-	
+
 	port
 	(
 		clk_geral		: in std_logic;
@@ -17,7 +18,7 @@ end entity;
 
 architecture processadorPython of pythonProcessor is
 -- controle
-signal regOp1_ctrl, regOp2_ctrl, regPc_ctrl, regComp_ctrl, regTos_ctrl, regInstr_ctrl, regEnd_ctrl, regOverflow_ctrl	: std_logic;
+signal regOp1_ctrl, regOp2_ctrl, regPc_ctrl, regComp_ctrl, regTos_ctrl, regInstr_ctrl, regEnd_ctrl, regOverflow_ctrl, regJump_ctrl	: std_logic;
 signal regPilha_WRITE_ctrl, regPilha_SAIDA_ctrl, regMemExt_WRITE_ctrl, regMemExt_READ_ctrl, regArg_ctrl, MuxRegOp1_ctrl	: std_logic;
 signal muxOp1_sel, muxOp2_sel, muxPilha_sel	: std_logic_vector(1 downto 0);
 signal ULA_sel	: std_logic_vector(2 downto 0);
@@ -28,15 +29,15 @@ signal reset_ctrl						: std_logic;
 -- regPilha
 signal wEntrada_regPilha, wSaida_regPilha		: std_logic_vector((DATA_WIDTH-1) downto 0);
 -- regOp1
-signal wSaida_regOp1	: std_logic_vector((DATA_WIDTH-1) downto 0);
+signal wSaida_regOp1	: std_logic_vector((DATA_END-1) downto 0);
 -- regOp2
-signal wSaida_regOp2	: std_logic_vector((DATA_WIDTH-1) downto 0);
+signal wSaida_regOp2	: std_logic_vector((DATA_END-1) downto 0);
 -- regPc
-signal wSaida_regPc	: std_logic_vector((DATA_WIDTH-1) downto 0);
+signal wSaida_regPc	: std_logic_vector((DATA_END-1) downto 0);
 -- regTos
-signal wEntrada_regTos, wSaida_regTos	: std_logic_vector((DATA_WIDTH-1) downto 0);
+signal wEntrada_regTos, wSaida_regTos	: std_logic_vector((DATA_END-1) downto 0);
 -- regEnd
-signal wSaida_regEnd	: std_logic_vector((DATA_WIDTH-1) downto 0);
+signal wSaida_regEnd	: std_logic_vector((DATA_END-1) downto 0);
 -- regMemExt
 signal wSaida_regMemExt	: std_logic_vector((DATA_WIDTH-1) downto 0);
 -- regComp
@@ -51,7 +52,7 @@ signal wMemExt_read, wMemExt_write	: std_logic_vector((DATA_WIDTH-1) downto 0);
 signal wEntrada_regInstr : std_logic_vector((DATA_WIDTH-1) downto 0);
 signal wSaida_memInstr	: std_logic_vector((DATA_WIDTH-1) downto 0);
 -- ula
-signal wEntrada_Ula1, wEntrada_Ula2, wSaida_Ula		: std_logic_vector((DATA_WIDTH-1) downto 0);
+signal wEntrada_Ula1, wEntrada_Ula2, wSaida_Ula		: std_logic_vector((DATA_END-1) downto 0);
 signal wSaida_UlaComp	: std_logic;
 -- regOpArg
 signal wEntrada_regOpArg	: std_logic_vector((DATA_WIDTH-1) downto 0);
@@ -60,26 +61,33 @@ signal wEntrada_regOverflow, wSaida_regOverflow	: std_logic;
 -- muxRegOp1
 signal wSaida_MuxRegOp1	: std_logic_vector((DATA_WIDTH-1) downto 0);
 -- regPc
-signal wEntrada_regPc	: std_logic_vector((DATA_WIDTH-1) downto 0);
+signal wEntrada_regPc	: std_logic_vector((DATA_END-1) downto 0);
 --funcoes
 signal muxPc_ctrl, pilhaFuncao_ctrl, soma_sub_ctrl, regTosFuncao_ctrl	: std_logic;
-signal wSaida_regTosFuncao, wSaida_pilhaFuncao, wEntrada_regTosFuncao	: std_logic_vector((DATA_WIDTH-1) downto 0);
+signal wSaida_regTosFuncao, wEntrada_regTosFuncao	: std_logic_vector((DATA_WIDTH-1) downto 0);
+signal wSaida_pilhaFuncao	: std_logic_vector((DATA_END-1) downto 0);
 -- retorno
 signal muxTos_ctrl, regDataReturn_ctrl, pilhaRetorno_ctrl	: std_logic;
-signal wSaida_muxTos, wSaida_regDataReturn, wSaida_pilhaRetorno	: std_logic_vector((DATA_WIDTH-1) downto 0);
+signal wSaida_regDataReturn	: std_logic_vector((DATA_WIDTH-1) downto 0);
+signal wSaida_muxTos 	: std_logic_vector((DATA_END-1) downto 0);
+signal wSaida_pilhaRetorno	: std_logic_vector((DATA_END-1) downto 0);
+-- regJump
+signal wSaida_regJump	: std_logic_vector((DATA_END-1) downto 0);
+signal wEntrada_regJump2	: std_logic_vector(((DATA_WIDTH*2)-1) downto 0);
+
 
 component regOp1 is
 	generic
 	(
 		DATA_WIDTH	: natural := 8
 	);
-	
+
 	port
 	(
 		clk					: in std_logic;
 		ctrl_regOp1			: in std_logic;
 		entrada_regOp1		: in std_logic_vector((DATA_WIDTH-1) downto 0);
-		saida_regOp1		: out std_logic_vector((DATA_WIDTH-1) downto 0)
+		saida_regOp1		: out std_logic_vector(((DATA_WIDTH*3)-1) downto 0)
 	);
 end component;
 
@@ -88,22 +96,22 @@ component regOp2 is
 	(
 		DATA_WIDTH	: natural := 8
 	);
-	
+
 	port
 	(
 		clk				: in std_logic;
 		ctrl_regOp2		: in std_logic;
 		entrada_regOp2	: in std_logic_vector((DATA_WIDTH-1) downto 0);
-		saida_regOp2	: out std_logic_vector((DATA_WIDTH-1) downto 0)
+		saida_regOp2	: out std_logic_vector(((DATA_WIDTH*3)-1) downto 0)
 	);
 end component;
 
 component regPc is
 	generic
 	(
-		DATA_WIDTH	: natural := 8
+		DATA_WIDTH	: natural := 24
 	);
-	
+
 	port
 	(
 		clk				: in std_logic;
@@ -117,13 +125,13 @@ end component;
 component regTos is
 	generic
 	(
-		DATA_WIDTH	: natural := 8
+		DATA_WIDTH	: natural := 24
 	);
-	
+
 	port
 	(
 		clk				: in std_logic;
-		reset				: in std_logic;
+		reset			: in std_logic;
 		ctrl_regTos		: in std_logic;
 		entrada_regTos	: in std_logic_vector((DATA_WIDTH-1) downto 0);
 		saida_regTos	: out std_logic_vector((DATA_WIDTH-1) downto 0)
@@ -133,9 +141,9 @@ end component;
 component regEnd is
 	generic
 	(
-		DATA_WIDTH	: natural := 8
+		DATA_WIDTH	: natural := 24
 	);
-	
+
 	port
 	(
 		clk				: in std_logic;
@@ -150,7 +158,7 @@ component regPilha is
 	(
 		DATA_WIDTH	: natural	:= 8
 	);
-	
+
 	port
 	(
 		clk						: in std_logic;
@@ -166,9 +174,9 @@ end component;
 component regInstr is
 	generic
 	(
-		DATA_WIDTH	: natural := 8 -- 8 bits do opcode 
+		DATA_WIDTH	: natural := 8 -- 8 bits do opcode
 	);
-	
+
 	port
 	(
 		clk					: in std_logic;
@@ -183,7 +191,7 @@ component regArg is
 	(
 		DATA_WIDTH	: natural	:= 8
 	);
-	
+
 	port
 	(
 		clk				: in std_logic;
@@ -199,7 +207,7 @@ component regComp is
 	(
 		DATA_WIDTH	: natural 	:= 8
 	);
-	
+
 	port
 	(
 		clk					: in std_logic;
@@ -212,13 +220,14 @@ end component;
 component muxOp1 is
 	generic
 	(
-		DATA_WIDTH	: natural := 8
+		DATA_WIDTH	: natural := 24
 	);
-	
+
 	port
 	(
 		sel_MuxOp1		: in std_logic_vector(1 downto 0);
 		entr_regOp1		: in std_logic_vector((DATA_WIDTH-1) downto 0);
+		entr_regJump	: in std_logic_vector((DATA_WIDTH-1) downto 0);
 		saida_muxOp1	: out std_logic_vector((DATA_WIDTH-1) downto 0)
 	);
 end component;
@@ -226,16 +235,17 @@ end component;
 component muxOp2 is
 	generic
 	(
-		DATA_WIDTH	: natural := 8
+		DATA_WIDTH	: natural := 24;
+		LENGTH_REG_ARG	: natural := 8
 	);
-	
+
 	port
 	(
 		sel_MuxOp2			: in std_logic_vector(1 downto 0);
 		entr_regTos			: in std_logic_vector((DATA_WIDTH-1) downto 0);
 		entr_regPc			: in std_logic_vector((DATA_WIDTH-1) downto 0);
 		entr_regOp2			: in std_logic_vector((DATA_WIDTH-1) downto 0);
-		entr_regArg			: in std_logic_vector((DATA_WIDTH-1) downto 0);
+		entr_regArg			: in std_logic_vector((LENGTH_REG_ARG-1) downto 0);
 		saida_muxOp2		: out std_logic_vector((DATA_WIDTH-1) downto 0)
 	);
 end component;
@@ -245,39 +255,39 @@ component muxPilha is
 	(
 		DATA_WIDTH	: natural := 8
 	);
-	
+
 	port
 	(
 		sel_muxPilha		: in std_logic_vector(1 downto 0);
-		entr_ULA				: in std_logic_vector((DATA_WIDTH-1) downto 0);
+		entr_ULA			: in std_logic_vector(((DATA_WIDTH*3)-1) downto 0);
 		entr_memInstr		: in std_logic_vector((DATA_WIDTH-1) downto 0);
 		entr_memExt			: in std_logic_vector((DATA_WIDTH-1) downto 0);
-		entr_regDataReturn : in std_logic_vector((DATA_WIDTH-1) downto 0);
+		entr_regDataReturn  : in std_logic_vector((DATA_WIDTH-1) downto 0);
 		saida_muxPilha		: out std_logic_vector((DATA_WIDTH-1) downto 0)
 	);
 end component;
 
-component muxRegOp1 is
-	generic 
-	(
-		DATA_WIDTH	: natural	:= 8
-	);
-	
-	port
-	(
-		ctrl_muxRegOp1		: in std_logic;
-		entrada_regArg	: in std_logic_vector((DATA_WIDTH-1) downto 0);
-		entrada_regOp1	: in std_logic_vector((DATA_WIDTH-1) downto 0);
-		saida_muxRegOp1	: out std_logic_vector((DATA_WIDTH-1) downto 0)
-	);
-end component;
+-- component muxRegOp1 is
+-- 	generic
+-- 	(
+-- 		DATA_WIDTH	: natural	:= 8
+-- 	);
+--
+-- 	port
+-- 	(
+-- 		ctrl_muxRegOp1		: in std_logic;
+-- 		entrada_regArg	: in std_logic_vector((DATA_WIDTH-1) downto 0);
+-- 		entrada_regOp1	: in std_logic_vector((DATA_WIDTH-1) downto 0);
+-- 		saida_muxRegOp1	: out std_logic_vector((DATA_WIDTH-1) downto 0)
+-- 	);
+-- end component;
 
 component regMemExt is
 	generic
 	(
 		DATA_WIDTH	: natural 	:= 8
 	);
-	
+
 	port
 	(
 		clk							: in std_logic;
@@ -293,9 +303,9 @@ end component;
 component ula is
 	generic
 	(
-		DATA_WIDTH	: natural	:= 8
+		DATA_WIDTH	: natural	:= 24
 	);
-	
+
 	port
 	(
 		sel_Ula				: in std_logic_vector(2 downto 0);
@@ -310,14 +320,15 @@ end component;
 component pilha is
 	generic
 	(
-		DATA_WIDTH	:	natural	:= 8
+		DATA_WIDTH	:	natural	:= 8;
+		END_WIDTH	:	natural	:= 24
 	);
-	
+
 	port
 	(
 		clk				: in std_logic;
 		ctrl_pilha		: in std_logic;
-		entrada_tos		: in std_logic_vector((DATA_WIDTH-1) downto 0);
+		entrada_tos		: in std_logic_vector((END_WIDTH-1) downto 0);
 		entrada_write	: in std_logic_vector((DATA_WIDTH-1) downto 0);
 		saida_read		: out std_logic_vector((DATA_WIDTH-1) downto 0)
 	);
@@ -327,15 +338,15 @@ component memExt is
 	generic
 	(
 		DATA_WIDTH	: natural	:= 8;
-		END_WIDTH	: natural 	:= 8
+		END_WIDTH	: natural 	:= 24
 	);
-	
+
 	port
 	(
 		clk				: in std_logic;
 		ctrl_memExt		: in std_logic;
 		entrada_write	: in std_logic_vector((DATA_WIDTH-1) downto 0);
-		entrada_addr	: in std_logic_vector((DATA_WIDTH-1) downto 0);
+		entrada_addr	: in std_logic_vector((END_WIDTH-1) downto 0);
 		saida_read		: out std_logic_vector((DATA_WIDTH-1) downto 0)
 	);
 end component;
@@ -344,15 +355,16 @@ component memInstr is
 	generic
 	(
 		DATA_WIDTH	: natural	:= 16;
-		END_WIDTH	: natural	:= 8;
+		END_WIDTH	: natural	:= 24;
 		DATA_OUT	: natural	:= 8
 	);
-	
+
 	port
 	(
-		entrada_pc		: in std_logic_vector((DATA_OUT-1) downto 0);
+		entrada_pc		: in std_logic_vector((END_WIDTH-1) downto 0);
 		saida_opCode	: out std_logic_vector((DATA_OUT-1) downto 0);
-		saida_opArg		: out std_logic_vector((DATA_OUT-1) downto 0)
+		saida_opArg		: out std_logic_vector((DATA_OUT-1) downto 0);
+		saida_regJump	: out std_logic_vector((DATA_WIDTH-1) downto 0)
 	);
 end component;
 
@@ -361,7 +373,7 @@ component regOverflow is
 	(
 		DATA_WIDTH	: natural	:= 8
 	);
-	
+
 	port
 	(
 		clk					: in std_logic;
@@ -376,7 +388,7 @@ component control is
 	(
 		DATA_WIDTH	: natural	:= 8
 	);
-	
+
 	port
 	(
 		clk						: in std_logic;
@@ -412,33 +424,34 @@ component control is
 		sel_muxPC				: out std_logic;
 		sel_ula					: out std_logic_vector(2 downto 0);
 		sel_soma_sub			: out std_logic;
-		sel_muxTos				: out std_logic
+		sel_muxTos				: out std_logic;
+		ctrl_regJump			: out std_logic
 	);
 end component;
 
 component pilhaFuncao is
 	generic
 	(
-		DATA_WIDTH	:	natural	:= 8;
+		DATA_WIDTH	:	natural	:= 24;
 		END_WIDTH	:	natural	:= 8
 	);
-	
+
 	port
 	(
 		clk						: in std_logic;
 		ctrl_pilhaFuncao		: in std_logic;
-		entrada_tosFuncao		: in std_logic_vector((DATA_WIDTH-1) downto 0);
+		entrada_tosFuncao		: in std_logic_vector((END_WIDTH-1) downto 0);
 		entrada_Pc				: in std_logic_vector((DATA_WIDTH-1) downto 0);
 		saida_Pc					: out std_logic_vector((DATA_WIDTH-1) downto 0)
 	);
 end component;
 
 component muxPc is
-	generic 
+	generic
 	(
-		DATA_WIDTH	: natural	:= 8
+		DATA_WIDTH	: natural	:= 24
 	);
-	
+
 	port
 	(
 		ctrl_muxPc		: in std_logic;
@@ -453,7 +466,7 @@ component regTosFuncao is
 	(
 		DATA_WIDTH	: natural := 8
 	);
-	
+
 	port
 	(
 		clk				: in std_logic;
@@ -469,21 +482,21 @@ component somador_subtrator is
 	(
 		DATA_WIDTH	: natural	:= 8
 	);
-	
+
 	port
 	(
 		sel_somaSub				: in std_logic;
-		entrada			: in std_logic_vector((DATA_WIDTH-1) downto 0);     
+		entrada			: in std_logic_vector((DATA_WIDTH-1) downto 0);
 		saida		: out std_logic_vector((DATA_WIDTH-1) downto 0)
 	);
 end component;
 
 component muxTos is
-	generic 
+	generic
 	(
-		DATA_WIDTH	: natural	:= 8
+		DATA_WIDTH	: natural	:= 24
 	);
-	
+
 	port
 	(
 		ctrl_muxTos		: in std_logic;
@@ -496,15 +509,15 @@ end component;
 component pilhaRetorno is
 	generic
 	(
-		DATA_WIDTH	:	natural	:= 8;
+		DATA_WIDTH	:	natural	:= 24;
 		END_WIDTH	:	natural	:= 8
 	);
-	
+
 	port
 	(
 		clk				: in std_logic;
 		ctrl_pilhaRetorno		: in std_logic;
-		entrada_tosRetorno	: in std_logic_vector((DATA_WIDTH-1) downto 0);
+		entrada_tosRetorno	: in std_logic_vector((END_WIDTH-1) downto 0);
 		entrada_Tos	: in std_logic_vector((DATA_WIDTH-1) downto 0);
 		saida_Tos		: out std_logic_vector((DATA_WIDTH-1) downto 0)
 	);
@@ -515,7 +528,7 @@ component regDataReturn is
 	(
 		DATA_WIDTH	: natural := 8
 	);
-	
+
 	port
 	(
 		clk					: in std_logic;
@@ -525,7 +538,35 @@ component regDataReturn is
 	);
 end component;
 
+
+component regJump is
+	generic
+	(
+		DATA_SAIDA	: natural := 24;
+		DATA_HALF	: natural := 8
+	);
+
+	port
+	(
+		clk					: in std_logic;
+		ctrl_regJump		: in std_logic;
+		entrada_regArg		: in std_logic_vector((DATA_HALF-1) downto 0);
+		entrada_memInstr	: in std_logic_vector(((DATA_HALF*2)-1) downto 0);
+		saida_regJump		: out std_logic_vector((DATA_SAIDA-1) downto 0)
+	);
+end component;
+
 begin
+
+comp_regJump	: regJump
+	port map
+	(
+		clk => clk_geral,
+		ctrl_regJump => regJump_ctrl,
+		entrada_regArg => wSaida_memInstr, -- saida regArg
+		entrada_memInstr => wEntrada_regJump2, -- entrada vinda da memInstr
+		saida_regJump => wSaida_regJump
+	);
 
 comp_regDataReturn	: regDataReturn
 	port map
@@ -572,7 +613,7 @@ comp_regOp2	: regOp2
 		entrada_regOp2 => wSaida_regPilha,
 		saida_regOp2 => wSaida_regOp2
 	);
-	
+
 comp_regPc	: regPc
 	port map
 	(
@@ -582,7 +623,7 @@ comp_regPc	: regPc
 		entrada_regPc => wEntrada_regPc,
 		saida_regPc => wSaida_regPc
 	);
-	
+
 comp_regTos	: regTos
 	port map
 	(
@@ -598,10 +639,10 @@ comp_regEnd	: regEnd
 	(
 		clk => clk_geral,
 		ctrl_regEnd => regEnd_ctrl,
-		entrada_regEnd => wSaida_memInstr,
+		entrada_regEnd => wSaida_regJump,
 		saida_regEnd => wSaida_regEnd
 	);
-	
+
 comp_regPilha	: regPilha
 	port map
 	(
@@ -632,7 +673,7 @@ comp_regArg		: regArg
 		saida_regArg => wSaida_memInstr,
 		saida_regArg_toCtrl => wSaida_regArg_toCtrl
 	);
-	
+
 comp_regComp	: regComp
 	port map
 	(
@@ -655,10 +696,11 @@ comp_muxOp1	: muxOp1
 	port map
 	(
 		sel_MuxOp1 => MuxOp1_sel,
-		entr_regOp1 => wSaida_MuxRegOp1,
+		entr_regOp1 => wSaida_regOp1,
+		entr_regJump => wSaida_regJump,
 		saida_muxOp1 => wEntrada_Ula1
 	);
-	
+
 comp_muxOp2	: muxOp2
 	port map
 	(
@@ -669,7 +711,7 @@ comp_muxOp2	: muxOp2
 		entr_regArg => wSaida_memInstr,
 		saida_muxOp2 => wEntrada_Ula2
 	);
-	
+
 comp_muxPilha	: muxPilha
 	port map
 	(
@@ -680,7 +722,7 @@ comp_muxPilha	: muxPilha
 		entr_regDataReturn => wSaida_regDataReturn,
 		saida_muxPilha => wEntrada_regPilha
 	);
-	
+
 comp_regMemExt	: regMemExt
 	port map
 	(
@@ -713,7 +755,7 @@ comp_pilha	: pilha
 		entrada_write => wPilha_write,
 		saida_read => wPilha_read
 	);
-	
+
 comp_memExt	: memExt
 	port map
 	(
@@ -729,9 +771,10 @@ comp_memInstr	: memInstr
 	(
 		entrada_pc => wSaida_regPc,
 		saida_opCode => wEntrada_regInstr,
-		saida_opArg => wEntrada_regOpArg
+		saida_opArg => wEntrada_regOpArg,
+		saida_regJump => wEntrada_regJump2
 	);
-	
+
 comp_control	: control
 	port map
 	(
@@ -771,15 +814,15 @@ comp_control	: control
 		ctrl_pilhaRetorno => pilhaRetorno_ctrl
 	);
 
-comp_muxRegOp1	: muxRegOp1
-	port map
-	(
-		ctrl_muxRegOp1 => muxRegOp1_ctrl,
-		entrada_regArg => wSaida_memInstr,
-		entrada_regOp1 => wSaida_regOp1,
-		saida_muxRegOp1 => wSaida_MuxRegOp1
-	);
-	
+-- comp_muxRegOp1	: muxRegOp1
+-- 	port map
+-- 	(
+-- 		ctrl_muxRegOp1 => muxRegOp1_ctrl,
+-- 		entrada_regArg => wSaida_memInstr,
+-- 		entrada_regOp1 => wSaida_regOp1,
+-- 		saida_muxRegOp1 => wSaida_MuxRegOp1
+-- 	);
+
 comp_pilhaFuncao	: pilhaFuncao
 	port map
 	(
@@ -788,7 +831,7 @@ comp_pilhaFuncao	: pilhaFuncao
 		entrada_tosFuncao => wSaida_regTosFuncao,
 		entrada_Pc => wSaida_regPc,
 		saida_Pc => wSaida_pilhaFuncao
-		
+
 	);
 
 comp_muxPC		: muxPc
@@ -799,7 +842,7 @@ comp_muxPC		: muxPc
 		entrada_Pilha => wSaida_PilhaFuncao,
 		saida_Pc => wEntrada_regPc
 	);
-	
+
 comp_regTosFuncao	: regTosFuncao
 	port map
 	(
@@ -817,6 +860,6 @@ comp_somador_subtrator	: somador_subtrator
 		entrada => wSaida_regTosFuncao,
 		saida => wEntrada_regTosFuncao
 	);
-	
+
 	overflow_geral <= wSaida_regOverflow;
 end processadorPython;

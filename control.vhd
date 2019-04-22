@@ -6,7 +6,7 @@ entity control is
 	(
 		DATA_WIDTH	: natural	:= 8
 	);
-	
+
 	port
 	(
 		clk						: in std_logic;
@@ -42,7 +42,8 @@ entity control is
 		sel_muxPC				: out std_logic;
 		sel_ula					: out std_logic_vector(2 downto 0);
 		sel_soma_sub			: out std_logic;
-		sel_muxTos				: out std_logic
+		sel_muxTos				: out std_logic;
+		ctrl_regJump			: out std_logic
 	);
 end entity;
 
@@ -55,14 +56,14 @@ signal verif_muxOp1, verif_muxOp2	: std_logic_vector(1 downto 0);
 --signal sEntrada_regComp, sEntrada_regOverflow	: std_logic;
 signal sEntrada_regInstr, sEntrada_regArg 	: std_logic_vector(7 downto 0);
 
-begin	
+begin
 	sEntrada_regArg <= entrada_regArg;
 	--sEntrada_regComp <= entrada_regComp;
 	sEntrada_regInstr <= entrada_regInstr;
 	--sEntrada_regOverflow <= entrada_regOverflow;
 
 	saida_reset <= entrada_reset;
-	
+
 	process(clk, entrada_reset, entrada_regComp, sEntrada_regInstr, sEntrada_regArg, entrada_regOverflow)
    begin
 		if(entrada_reset='1') then
@@ -71,7 +72,7 @@ begin
 			case atual is
 				when first =>
 					atual <= sAUX;
-				when sAUX => 
+				when sAUX =>
 					case sEntrada_regInstr is
 						when "00001100" =>
 							 atual <= lc1;
@@ -88,7 +89,7 @@ begin
 							 else
 									atual <= pj_stay;
 							 end if;
-								when "00110001" => 
+								when "00110001" =>
 									 if(entrada_regComp='1') then
 										  atual <= pj_jump;
 									 else
@@ -96,7 +97,7 @@ begin
 									 end if;
 								when "00110010" =>
 									 atual <= jf1;
-								when "00110011" => 
+								when "00110011" =>
 									 atual <= ja1;
 								when "00101000" =>
 									 atual <= b1;
@@ -120,7 +121,7 @@ begin
 						  atual <= lc1_AUX;
 					 when lc1_AUX =>
 						  atual <= lc2;
-					 when lc2 => 
+					 when lc2 =>
 						  atual <= lc3;
 					 when lc3 =>
 						  atual <= first;
@@ -158,7 +159,7 @@ begin
 					 --                      FINAL POP JUMP
 					 when co1 =>
 						  atual <= co2;
-					 when co2 => 
+					 when co2 =>
 						  atual <= co3;
 					 when co3 =>
 						  atual <= co4;
@@ -168,11 +169,11 @@ begin
 						  case sEntrada_regArg is
 								when "00011000" =>
 									 atual <= co5_3; -- igual
-								when "00011001" => 
+								when "00011001" =>
 									 atual <= co5_1; -- menor
 								when "00011010" =>
 									 atual <= co5_2; -- maior
-								when others => 
+								when others =>
 									atual <= first;
 						  end case;
 					 when co5_1 =>
@@ -220,7 +221,7 @@ begin
 									 atual <= b4_4;
 								when "00101000" =>
 									 atual <= b4_1;
-								when others => 
+								when others =>
 									atual <= first;
 						  end case;
 					 when b4_1 =>
@@ -237,30 +238,30 @@ begin
 						  atual <= b6;
 					 when b6 =>
 						  atual <= first;
-					 when cf1 => 
+					 when cf1 =>
 						  atual <= cf2;
-					 when cf2 => 
+					 when cf2 =>
 						  atual <= cf3;
-					 when cf3 => 
+					 when cf3 =>
 						  atual <= cf4;
-					 when cf4 => 
+					 when cf4 =>
 						  atual <= first;
-					 when rv1 => 
+					 when rv1 =>
 						  atual <= rv2;
-					 when rv2 => 
+					 when rv2 =>
 						  atual <= rv3;
-					 when rv3 => 
+					 when rv3 =>
 						  atual <= rv4;
-					 when rv4 => 
+					 when rv4 =>
 						  atual <= rv5;
-					 when rv5 => 
+					 when rv5 =>
 						  atual <= rv6;
-					 when rv6 => 
+					 when rv6 =>
 						  atual <= first;
 				end case;
 		  end if;
 	 end process;
-	 
+
 	 process(atual, sEntrada_regInstr, sEntrada_regArg)
 	 begin
 		  case atual is
@@ -1077,11 +1078,11 @@ begin
 					 case sEntrada_regArg is
 							when "00011000" =>
 								 sel_ula <= "100"; -- igual
-							when "00011001" => 
+							when "00011001" =>
 								 sel_ula <= "101"; -- menor
 							when "00011010" =>
 								 sel_ula <= "110"; -- maior
-							when others => 
+							when others =>
 								sel_ula <= "100";
 					 end case;
 					 ctrl_regComp <= '1';
@@ -1670,7 +1671,7 @@ begin
 					 sel_muxTos <= '0';
 					 ctrl_regDataReturn <= '0';
 					 ctrl_pilhaRetorno <= '0';
-				when cf1 => 
+				when cf1 =>
 					 ctrl_regInstr <= '0';
 					 ctrl_regArg <= '0';
 					 sel_soma_sub <= '0';
@@ -1699,7 +1700,7 @@ begin
 					 sel_muxTos <= '0';
 					 ctrl_regDataReturn <= '0';
 					 ctrl_pilhaRetorno <= '0';
-				when cf2 => 
+				when cf2 =>
 					 ctrl_regPc <= '1';
 					 ctrl_regTosFuncao <= '1';
 					 -- ---------------------------
@@ -1728,7 +1729,7 @@ begin
 					 sel_muxTos <= '0';
 					 ctrl_regDataReturn <= '0';
 					 ctrl_pilhaRetorno <= '0';
-				when cf3 => 
+				when cf3 =>
 					 ctrl_regPc <= '0';
 					 ctrl_regTosFuncao <= '0';
 					 ctrl_pilhaFuncao <= '1';
@@ -1757,7 +1758,7 @@ begin
 					 sel_muxPC <= '0';
 					 sel_muxTos <= '0';
 					 ctrl_regDataReturn <= '0';
-				when cf4 => 
+				when cf4 =>
 					 ctrl_pilhaFuncao <= '0';
 					 ctrl_pilhaRetorno <= '0';
 					 ctrl_regPc <= '1';
@@ -1786,7 +1787,7 @@ begin
 					 sel_muxPC <= '0';
 					 sel_muxTos <= '0';
 					 ctrl_regDataReturn <= '0';
-				when rv1 => 
+				when rv1 =>
 					 ctrl_regInstr <= '0';
 					 ctrl_regArg <= '0';
 					 sel_muxPC <= '1';
@@ -1815,7 +1816,7 @@ begin
 					 ctrl_regTosFuncao <= '0';
 					 ctrl_pilhaFuncao <= '0';
 					 ctrl_pilhaRetorno <= '0';
-				when rv2 => 
+				when rv2 =>
 					 ctrl_regDataReturn <= '0';
 					 ctrl_regPc <= '1';
 					 ctrl_regTos <= '1';
@@ -1844,7 +1845,7 @@ begin
 					 ctrl_regTosFuncao <= '0';
 					 ctrl_pilhaFuncao <= '0';
 					 ctrl_pilhaRetorno <= '0';
-				when rv3 => 
+				when rv3 =>
 					 ctrl_regPc <= '0';
 					 ctrl_regTos <= '0';
 					 sel_soma_sub <= '1';
@@ -1873,7 +1874,7 @@ begin
 					 ctrl_regTosFuncao <= '0';
 					 ctrl_pilhaFuncao <= '0';
 					 ctrl_pilhaRetorno <= '0';
-				when rv4 => 
+				when rv4 =>
 					 ctrl_regTosFuncao <= '1';
 					 ctrl_regTos <= '1';
 					 sel_MuxPilha <= "10";
@@ -1902,7 +1903,7 @@ begin
 					 sel_MuxRegOp1 <= '0';
 					 ctrl_pilhaFuncao <= '0';
 					 ctrl_pilhaRetorno <= '0';
-				when rv5 => 
+				when rv5 =>
 					 ctrl_regTosFuncao <= '0';
 					 ctrl_regTos <= '0';
 					 ctrl_regPilha_WRITE <= '1';
@@ -1931,7 +1932,7 @@ begin
 					 sel_MuxRegOp1 <= '0';
 					 ctrl_pilhaFuncao <= '0';
 					 ctrl_pilhaRetorno <= '0';
-				when rv6 => 
+				when rv6 =>
 					 ctrl_regPilha_WRITE <= '0';
 					 ctrl_pilha <= '1';
 					 -- ---------------------------
@@ -1961,6 +1962,6 @@ begin
 					 ctrl_pilhaFuncao <= '0';
 					 ctrl_pilhaRetorno <= '0';
 			  end case;
-		end process;	  
-		
+		end process;
+
 end arcControl;

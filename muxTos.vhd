@@ -2,11 +2,11 @@ library ieee;
 use ieee.std_logic_1164.all;
 
 entity muxTos is
-	generic 
+	generic
 	(
-		DATA_WIDTH	: natural	:= 8
+		DATA_WIDTH	: natural	:= 24
 	);
-	
+
 	port
 	(
 		ctrl_muxTos		: in std_logic;

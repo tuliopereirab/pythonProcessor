@@ -6,15 +6,15 @@ use ieee.numeric_std.all;
 entity pilhaFuncao is
 	generic
 	(
-		DATA_WIDTH	:	natural	:= 8;
+		DATA_WIDTH	:	natural	:= 24;
 		END_WIDTH	:	natural	:= 8
 	);
-	
+
 	port
 	(
 		clk				: in std_logic;
 		ctrl_pilhaFuncao		: in std_logic;
-		entrada_tosFuncao	: in std_logic_vector((DATA_WIDTH-1) downto 0);
+		entrada_tosFuncao	: in std_logic_vector((END_WIDTH-1) downto 0);
 		entrada_Pc	: in std_logic_vector((DATA_WIDTH-1) downto 0);
 		saida_Pc		: out std_logic_vector((DATA_WIDTH-1) downto 0)
 	);
@@ -26,7 +26,7 @@ type memory_t is array(2**END_WIDTH-1 downto 0) of word_t;
 signal pilha		: memory_t;
 --attribute pilha_init_file	: string;
 --attribute pilha_init_file of pilha	: signal is "iniciarPilha.mif";
-	
+
 signal addr_reg	: natural range 0 to 2**END_WIDTH-1;
 signal endereco_read	: natural range 0 to 2**END_WIDTH-1;
 
@@ -35,8 +35,8 @@ signal end_write	:	natural range 0 to 2**END_WIDTH-1;
 begin
 	endereco_read <= to_integer(unsigned(entrada_tosFuncao));
 	end_write <= endereco_read + 0;
-	
-	
+
+
 	process(clk)
 	begin
 		if(rising_edge(clk)) then
@@ -45,6 +45,6 @@ begin
 			end if;
 		end if;
 	end process;
-	
+
 	saida_Pc <= pilha(end_write);
 end arcPilhaFuncao;

@@ -9,11 +9,11 @@ entity regPc is
 
 	port
 	(
-		clk				: in std_logic;
-		reset			: in std_logic;
-		ctrl_regPc		: in std_logic;
-		entrada_regPc	: in std_logic_vector((DATA_WIDTH-1) downto 0);
-		saida_regPc		: out std_logic_vector((DATA_WIDTH-1) downto 0)
+		clk				: in std_logic;												-- clk
+		reset			: in std_logic;												-- data_in_2
+		ctrl_regPc		: in std_logic;												-- ctrl_in
+		entrada_regPc	: in std_logic_vector((DATA_WIDTH-1) downto 0);				-- data_in_1
+		saida_regPc		: out std_logic_vector((DATA_WIDTH-1) downto 0)				-- data_out
 	);
 end entity;
 

@@ -10,11 +10,11 @@ entity regJump is
 
 	port
 	(
-		clk					: in std_logic;
-		ctrl_regJump		: in std_logic;
-		entrada_regArg		: in std_logic_vector((DATA_HALF-1) downto 0);
-		entrada_memInstr	: in std_logic_vector(((DATA_HALF*2)-1) downto 0);
-		saida_regJump		: out std_logic_vector((DATA_SAIDA-1) downto 0)
+		clk					: in std_logic;											-- clk
+		ctrl_regJump		: in std_logic;											-- ctrl_in
+		entrada_regArg		: in std_logic_vector((DATA_HALF-1) downto 0);			-- data_in_1
+		entrada_memInstr	: in std_logic_vector(((DATA_HALF*2)-1) downto 0);		-- data_in_2
+		saida_regJump		: out std_logic_vector((DATA_SAIDA-1) downto 0)			-- data_out
 	);
 end entity;
 

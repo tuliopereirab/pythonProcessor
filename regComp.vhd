@@ -6,17 +6,17 @@ entity regComp is
 	(
 		DATA_WIDTH	: natural 	:= 8
 	);
-	
+
 	port
 	(
 		clk					: in std_logic;
 		ctrl_regComp 		: in std_logic;
-		entrada_regComp	: in std_logic;
+		entrada_regComp		: in std_logic;
 		saida_regComp		: out std_logic
 	);
 end entity;
 
-architecture registerComp of regComp is 
+architecture registerComp of regComp is
 begin
 	process(clk)
 	begin

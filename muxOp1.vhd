@@ -21,7 +21,7 @@ end entity;
 architecture mux1 of muxOp1 is
 signal val1, val0, valPilha	: std_logic_vector((DATA_WIDTH-1) downto 0);
 begin
-	val1 <= "0000000000000001";
+	val1 <= "0000000000000001";         -- controle diretamente pela entrada no arquivo inicial
 	val0 <= "0000000000000000";
 	valPilha <= "0000000000000001";
 

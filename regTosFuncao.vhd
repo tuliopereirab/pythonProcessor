@@ -6,14 +6,14 @@ entity regTosFuncao is
 	(
 		DATA_WIDTH	: natural := 8
 	);
-	
+
 	port
 	(
-		clk				: in std_logic;
-		reset				: in std_logic;
-		ctrl_regTosFuncao		: in std_logic;
-		entrada_regTosFuncao	: in std_logic_vector((DATA_WIDTH-1) downto 0);
-		saida_regTosFuncao	: out std_logic_vector((DATA_WIDTH-1) downto 0)
+		clk						: in std_logic;										-- clk
+		reset					: in std_logic;										-- data_in_2
+		ctrl_regTosFuncao		: in std_logic;										-- ctrl_in
+		entrada_regTosFuncao	: in std_logic_vector((DATA_WIDTH-1) downto 0);		-- data_in_1
+		saida_regTosFuncao		: out std_logic_vector((DATA_WIDTH-1) downto 0)		-- data_out
 	);
 end entity;
 

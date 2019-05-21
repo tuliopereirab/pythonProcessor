@@ -6,12 +6,12 @@ entity regMemExt is
 	(
 		DATA_WIDTH	: natural 	:= 8
 	);
-	
+
 	port
 	(
 		clk							: in std_logic;
 		ctrl_regMemExt_Write		: in std_logic;
-		ctrl_regMemExt_Read		: in std_logic;
+		ctrl_regMemExt_Read			: in std_logic;
 		entrada_RegPilha			: in std_logic_vector((DATA_WIDTH-1) downto 0);
 		entrada_Mem					: in std_logic_vector((DATA_WIDTH-1) downto 0); -- vem da memória (READ)
 		saida_regPilha				: out std_logic_vector((DATA_WIDTH-1) downto 0);
@@ -29,7 +29,7 @@ begin
 			end if;
 		end if;
 	end process;
-	
+
 	process(clk)
 	begin
 		if(rising_edge(clk)) then
@@ -39,4 +39,3 @@ begin
 		end if;
 	end process;
 end registerMemExt;
-	

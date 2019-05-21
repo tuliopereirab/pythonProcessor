@@ -6,13 +6,13 @@ entity regArg is
 	(
 		DATA_WIDTH	: natural	:= 8
 	);
-	
+
 	port
 	(
 		clk						: in std_logic;
 		ctrl_regArg				: in std_logic;
 		entrada_regArg			: in std_logic_vector((DATA_WIDTH-1) downto 0);
-		saida_regArg_toCtrl	: out std_logic_vector((DATA_WIDTH-1) downto 0);
+		saida_regArg_toCtrl		: out std_logic_vector((DATA_WIDTH-1) downto 0);    -- fazer uma saída só que será ligada ao controle também
 		saida_regArg			: out std_logic_vector((DATA_WIDTH-1) downto 0)
 	);
 end entity;
